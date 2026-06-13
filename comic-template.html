@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{COMIC_TITLE}}</title>
+<style>
+  /* ============ 基础重置 ============ */
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  
+  body {
+    background: linear-gradient(135deg, #FFF8F0 0%, #FFF0E6 50%, #FFF5F0 100%);
+    font-family: "PingFang SC", "Microsoft YaHei", "Noto Sans SC", "Hiragino Sans GB", sans-serif;
+    color: #3D2B1F;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  /* ============ 漫画容器 ============ */
+  .comic-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 40px 20px 60px;
+  }
+
+  /* ============ 标题区域 ============ */
+  .comic-header {
+    text-align: center;
+    margin-bottom: 48px;
+    padding: 32px 0;
+  }
+  .comic-header h1 {
+    font-size: 2.4em;
+    font-weight: 800;
+    color: #5C3D2E;
+    letter-spacing: 2px;
+    margin-bottom: 8px;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.06);
+  }
+  .comic-header .subtitle {
+    font-size: 1em;
+    color: #A07B64;
+    font-style: italic;
+    letter-spacing: 1px;
+  }
+  .comic-header .divider {
+    width: 60px;
+    height: 3px;
+    background: linear-gradient(90deg, #F4A683, #E8836B);
+    margin: 16px auto 0;
+    border-radius: 2px;
+  }
+
+  /* ============ 章节标题 ============ */
+  .chapter-title {
+    font-size: 1.3em;
+    font-weight: 700;
+    color: #6B4226;
+    text-align: center;
+    margin: 40px 0 24px;
+    padding: 12px 0;
+    border-top: 2px dashed #E8CDB5;
+    border-bottom: 2px dashed #E8CDB5;
+    letter-spacing: 3px;
+  }
+
+  /* ============ 面板网格 ============ */
+  .panel-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+
+  /* ============ 单个面板 ============ */
+  .panel {
+    position: relative;
+    border-radius: 10px;
+    overflow: hidden;
+    background: #FFF;
+    box-shadow: 0 4px 16px rgba(92, 61, 46, 0.10), 0 1px 4px rgba(92, 61, 46, 0.06);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  .panel:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(92, 61, 46, 0.14), 0 2px 8px rgba(92, 61, 46, 0.08);
+  }
+  .panel img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  /* 全宽面板 */
+  .panel.full-width {
+    grid-column: 1 / -1;
+  }
+
+  /* ============ 旁白条 ============ */
+  .narration {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(transparent, rgba(30, 15, 5, 0.75));
+    color: #FFF;
+    padding: 32px 16px 14px;
+    font-size: 0.9em;
+    line-height: 1.5;
+    letter-spacing: 0.5px;
+  }
+
+  /* ============ 对话气泡 ============ */
+  .speech-bubble {
+    position: absolute;
+    background: #FFFFFF;
+    color: #3D2B1F;
+    padding: 10px 16px;
+    border-radius: 18px;
+    font-size: 0.85em;
+    font-weight: 500;
+    max-width: 220px;
+    line-height: 1.4;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+    border: 1.5px solid #E8CDB5;
+  }
+  /* 气泡小三角（朝下） */
+  .speech-bubble::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 24px;
+    width: 0;
+    height: 0;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-top: 10px solid #FFFFFF;
+    filter: drop-shadow(0 2px 1px rgba(0,0,0,0.06));
+  }
+  /* 气泡定位变体 */
+  .speech-bubble.top-left { top: 16px; left: 16px; }
+  .speech-bubble.top-right { top: 16px; right: 16px; }
+  .speech-bubble.top-right::after { left: auto; right: 24px; }
+  .speech-bubble.center { top: 16px; left: 50%; transform: translateX(-50%); }
+
+  /* ============ 情绪文字 ============ */
+  .emotion-text {
+    position: absolute;
+    font-size: 1.6em;
+    font-weight: 800;
+    font-style: italic;
+    color: rgba(255, 255, 255, 0.85);
+    text-shadow: 2px 2px 6px rgba(0,0,0,0.3);
+    letter-spacing: 3px;
+  }
+  .emotion-text.center {
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+  }
+
+  /* ============ 页脚 ============ */
+  .comic-footer {
+    text-align: center;
+    margin-top: 48px;
+    padding: 24px 0;
+    border-top: 2px dashed #E8CDB5;
+    color: #A07B64;
+    font-size: 0.85em;
+    font-style: italic;
+  }
+  .comic-footer .end-mark {
+    font-size: 1.8em;
+    margin-bottom: 8px;
+    letter-spacing: 6px;
+  }
+
+  /* ============ 响应式 ============ */
+  @media (max-width: 640px) {
+    .panel-grid { grid-template-columns: 1fr; }
+    .comic-header h1 { font-size: 1.8em; }
+    .speech-bubble { max-width: 180px; font-size: 0.8em; }
+    .emotion-text { font-size: 1.2em; }
+  }
+
+  /* ============ 打印优化 ============ */
+  @media print {
+    body { background: #FFF; }
+    .panel { break-inside: avoid; box-shadow: none; border: 1px solid #DDD; }
+    .panel:hover { transform: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="comic-container">
+
+  <!-- ====== 标题 ====== -->
+  <header class="comic-header">
+    <h1>{{COMIC_TITLE}}</h1>
+    <p class="subtitle">{{COMIC_SUBTITLE}}</p>
+    <div class="divider"></div>
+  </header>
+
+  <!-- ====== 章节（可选，短篇可省略） ====== -->
+  <!-- <h2 class="chapter-title">第一章 · {{CHAPTER_NAME}}</h2> -->
+
+  <!-- ====== 面板网格 ====== -->
+  <div class="panel-grid">
+
+    <!-- 示例面板 1：普通面板（带旁白） -->
+    <div class="panel">
+      <img src="data:image/png;base64,{{PANEL_1_IMAGE_BASE64}}" alt="Panel 1">
+      <div class="narration">{{PANEL_1_NARRATION}}</div>
+    </div>
+
+    <!-- 示例面板 2：普通面板（带对话气泡） -->
+    <div class="panel">
+      <img src="data:image/png;base64,{{PANEL_2_IMAGE_BASE64}}" alt="Panel 2">
+      <div class="speech-bubble top-left">{{PANEL_2_DIALOGUE}}</div>
+    </div>
+
+    <!-- 示例面板 3：全宽重要场景 -->
+    <div class="panel full-width">
+      <img src="data:image/png;base64,{{PANEL_3_IMAGE_BASE64}}" alt="Panel 3">
+      <div class="emotion-text center">{{PANEL_3_EMOTION}}</div>
+      <div class="narration">{{PANEL_3_NARRATION}}</div>
+    </div>
+
+    <!-- 示例面板 4：带多个气泡的对话场景 -->
+    <div class="panel full-width">
+      <img src="data:image/png;base64,{{PANEL_4_IMAGE_BASE64}}" alt="Panel 4">
+      <div class="speech-bubble top-left">{{PANEL_4_DIALOGUE_A}}</div>
+      <div class="speech-bubble top-right">{{PANEL_4_DIALOGUE_B}}</div>
+    </div>
+
+    <!-- 继续添加更多面板... -->
+
+  </div>
+
+  <!-- ====== 页脚 ====== -->
+  <footer class="comic-footer">
+    <div class="end-mark">- END -</div>
+    <p>{{FOOTER_TEXT}}</p>
+  </footer>
+
+</div>
+
+</body>
+</html>

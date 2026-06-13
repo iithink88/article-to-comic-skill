@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Skill时代 — 漫画</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;700;900&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #1a1a2e;
+    font-family: 'Noto Sans SC', 'Microsoft YaHei', sans-serif;
+    display: flex;
+    justify-content: center;
+    padding: 30px 10px;
+    min-height: 100vh;
+  }
+
+  .comic-page {
+    max-width: 900px;
+    width: 100%;
+  }
+
+  /* Title */
+  .comic-title {
+    text-align: center;
+    margin-bottom: 24px;
+    position: relative;
+  }
+  .comic-title h1 {
+    font-size: 42px;
+    font-weight: 900;
+    color: #fff;
+    text-shadow: 3px 3px 0 #e94560, 6px 6px 0 rgba(233,69,96,0.3);
+    letter-spacing: 4px;
+    display: inline-block;
+    background: linear-gradient(135deg, #f9d423, #e94560);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .comic-title .subtitle {
+    color: #8892b0;
+    font-size: 14px;
+    margin-top: 6px;
+    letter-spacing: 2px;
+  }
+
+  /* Grid layout */
+  .comic-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  /* Panel base */
+  .panel {
+    position: relative;
+    border: 4px solid #16213e;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #0f3460;
+    box-shadow: 6px 6px 0 rgba(0,0,0,0.3);
+    transition: transform 0.2s;
+  }
+  .panel:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 8px 8px 0 rgba(0,0,0,0.4);
+  }
+
+  /* Full-width panels */
+  .panel.full-width {
+    grid-column: 1 / -1;
+  }
+
+  /* Panel image */
+  .panel img {
+    width: 100%;
+    height: 280px;
+    object-fit: cover;
+    display: block;
+  }
+  .panel.full-width img {
+    height: 340px;
+  }
+
+  /* Panel number badge */
+  .panel-number {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    width: 36px;
+    height: 36px;
+    background: #e94560;
+    color: #fff;
+    font-weight: 900;
+    font-size: 18px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 2px 2px 6px rgba(0,0,0,0.4);
+    z-index: 10;
+    border: 2px solid #fff;
+  }
+
+  /* Caption overlay */
+  .panel-caption {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(transparent, rgba(0,0,0,0.85) 30%);
+    padding: 40px 16px 14px;
+    color: #fff;
+  }
+  .panel-caption .caption-title {
+    font-size: 17px;
+    font-weight: 900;
+    margin-bottom: 4px;
+    color: #f9d423;
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.6);
+  }
+  .panel-caption .caption-text {
+    font-size: 13px;
+    line-height: 1.6;
+    color: #ccd6f6;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+  }
+
+  /* Speech bubble */
+  .speech-bubble {
+    position: absolute;
+    background: #fff;
+    border-radius: 18px;
+    padding: 10px 16px;
+    font-size: 13px;
+    font-weight: 700;
+    color: #1a1a2e;
+    box-shadow: 2px 2px 8px rgba(0,0,0,0.2);
+    z-index: 5;
+    max-width: 220px;
+    line-height: 1.5;
+  }
+  .speech-bubble::after {
+    content: '';
+    position: absolute;
+    bottom: -12px;
+    left: 24px;
+    width: 0;
+    height: 0;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-top: 14px solid #fff;
+  }
+  .speech-bubble.right::after {
+    left: auto;
+    right: 24px;
+  }
+
+  /* Narration box */
+  .narration-box {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: #f9d423;
+    color: #1a1a2e;
+    padding: 8px 14px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 700;
+    max-width: 200px;
+    line-height: 1.5;
+    box-shadow: 2px 2px 6px rgba(0,0,0,0.3);
+    z-index: 5;
+  }
+
+  /* Footer */
+  .comic-footer {
+    text-align: center;
+    margin-top: 24px;
+    padding: 16px;
+    color: #4a5568;
+    font-size: 12px;
+    letter-spacing: 1px;
+    border-top: 1px solid #2d3748;
+  }
+
+  /* Decorative elements */
+  .deco-stars {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: -1;
+  }
+  .deco-stars span {
+    position: absolute;
+    width: 3px;
+    height: 3px;
+    background: rgba(249,212,35,0.3);
+    border-radius: 50%;
+    animation: twinkle 3s infinite alternate;
+  }
+  @keyframes twinkle {
+    0% { opacity: 0.2; }
+    100% { opacity: 1; }
+  }
+
+  /* Responsive */
+  @media (max-width: 600px) {
+    .comic-grid {
+      grid-template-columns: 1fr;
+    }
+    .panel img { height: 220px; }
+    .panel.full-width img { height: 260px; }
+    .comic-title h1 { font-size: 28px; }
+    .speech-bubble { font-size: 11px; max-width: 160px; }
+    .narration-box { font-size: 11px; max-width: 150px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="deco-stars">
+  <span style="top:5%;left:10%;animation-delay:0s"></span>
+  <span style="top:15%;left:85%;animation-delay:0.5s"></span>
+  <span style="top:30%;left:5%;animation-delay:1s"></span>
+  <span style="top:50%;left:92%;animation-delay:1.5s"></span>
+  <span style="top:70%;left:8%;animation-delay:2s"></span>
+  <span style="top:85%;left:80%;animation-delay:2.5s"></span>
+  <span style="top:40%;left:50%;animation-delay:0.8s"></span>
+  <span style="top:60%;left:30%;animation-delay:1.2s"></span>
+  <span style="top:20%;left:60%;animation-delay:1.8s"></span>
+  <span style="top:90%;left:45%;animation-delay:0.3s"></span>
+</div>
+
+<div class="comic-page">
+
+  <!-- Title -->
+  <div class="comic-title">
+    <h1>Skill 时代已来</h1>
+    <div class="subtitle">— 从提示词到能力资产的进化 —</div>
+  </div>
+
+  <div class="comic-grid">
+
+    <!-- Panel 1: Skill Era arrives -->
+    <div class="panel full-width">
+      <div class="panel-number">1</div>
+      <div class="speech-bubble" style="top:20px;right:80px;">
+        豆包也支持调用Skill了！<br>正式进入技能时代！
+      </div>
+      <img src="panel1_skill_era_1781341113.png" alt="技能时代来临">
+      <div class="panel-caption">
+        <div class="caption-title">技能时代来临</div>
+        <div class="caption-text">豆包支持调用Skill，标志着我们正式迈入技能时代。未来属于那些能按需加载能力的人。</div>
+      </div>
+    </div>
+
+    <!-- Panel 2: No more apps, just skills -->
+    <div class="panel">
+      <div class="panel-number">2</div>
+      <div class="narration-box">不再需要一堆App</div>
+      <img src="panel2_no_more_apps_1781341124.png" alt="告别App">
+      <div class="panel-caption">
+        <div class="caption-title">告别App洪流</div>
+        <div class="caption-text">未来不需要一堆新App，只需按需加载的Skill。每一次解决真实任务，都在沉淀可复用的能力资产。</div>
+      </div>
+    </div>
+
+    <!-- Panel 3: Skill ≠ Prompt -->
+    <div class="panel">
+      <div class="panel-number">3</div>
+      <div class="speech-bubble right" style="top:20px;left:20px;">
+        Skill不只是提示词，<br>它是工程化能力包！
+      </div>
+      <img src="panel3_not_just_prompt_1781341135.png" alt="Skill不只是提示词">
+      <div class="panel-caption">
+        <div class="caption-title">Skill ≠ 提示词</div>
+        <div class="caption-text">它把人的审美、行业SOP和工具调用封装成工程化能力包——版式骨架、配色约束、纠错逻辑，全部固化。</div>
+      </div>
+    </div>
+
+    <!-- Panel 4: Let AI search GitHub -->
+    <div class="panel">
+      <div class="panel-number">4</div>
+      <div class="speech-bubble" style="top:20px;right:60px;">
+        省时间？让AI先去GitHub搜搜！
+      </div>
+      <img src="panel4_github_search_1781341160.png" alt="GitHub搜索">
+      <div class="panel-caption">
+        <div class="caption-title">别重复造轮子</div>
+        <div class="caption-text">为了省时间，先让AI去GitHub搜搜有没有现成的Skill，避免重复造轮子。</div>
+      </div>
+    </div>
+
+    <!-- Panel 5: Architecture -->
+    <div class="panel">
+      <div class="panel-number">5</div>
+      <div class="narration-box">中心短，辐射厚</div>
+      <img src="panel5_architecture_1781341172.png" alt="Skill架构">
+      <div class="panel-caption">
+        <div class="caption-title">好Skill的架构</div>
+        <div class="caption-text">主入口只放高信号流程，把长文档、模板和脚本往后放。最值钱的是来自真实失败的避坑指南。</div>
+      </div>
+    </div>
+
+    <!-- Panel 6: Widening gap -->
+    <div class="panel full-width">
+      <div class="panel-number">6</div>
+      <div class="speech-bubble" style="top:20px;left:60px;">
+        有方法论、有品味的人，<br>正在把专家经验打包成<br>"能力商品"！
+      </div>
+      <img src="panel6_widening_gap_1781341182.png" alt="Skill拉大差距">
+      <div class="panel-caption">
+        <div class="caption-title">Skill正在拉大人的差距</div>
+        <div class="caption-text">有方法论、有品味的人，正通过Skill把专家经验打包成可复用的"能力商品"。大家一起攒Skill，也要自己做Skill！</div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="comic-footer">
+    SKILL ERA COMIC &bull; 2026 &bull; 每一格都是对未来工作方式的一次思考
+  </div>
+
+</div>
+
+</body>
+</html>
